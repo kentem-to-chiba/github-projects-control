@@ -1,28 +1,72 @@
 import { FormEventHandler, useState } from "react";
 import "./App.css";
 import { Button, Container, Input, MenuItem, Select } from "@mui/material";
+import copyFilteredRows from "./core/copyFilteredRows";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-function App() {
-  const [personalAccessToken, setPersonalAccessToken] = useState<string>("");
-  const [projectId, setProjectId] = useState<string>("");
-  const [filters, setFilters] = useState<
-    {
+type KeyOfUnion<T> = T extends T ? keyof T : never;
+export type DistributiveOmit<T, K extends KeyOfUnion<T>> = T extends T ? Omit<T, K> : never;
+
+export type Filter =
+  | {
       key: string;
       value: string;
-      type: "text" | "date" | "number" | "singleSelect" | "iteration";
-    }[]
-  >([{ key: "name", value: "", type: "text" }]);
-  const [copyTargets, setCopyTargets] = useState<
-    {
+      type: "text" | "date";
+    }
+  | {
       key: string;
-      type: "text" | "date" | "number" | "singleSelect" | "iteration";
-    }[]
-  >([{ key: "name", type: "text" }]);
+      value: number;
+      type: "number";
+    }
+  | {
+      key: string;
+      value: string;
+      type: "singleSelect";
+    }
+  | {
+      key: string;
+      value: string;
+      type: "iteration";
+    };
+
+type Env = {
+  personalAccessToken: string;
+  projectId: string;
+  setPersonalAccessToken: (personalAccessToken: string) => void;
+  setProjectId: (projectId: string) => void;
+};
+
+const useEnvStore = create<Env, [["zustand/persist", Env]]>(
+  persist(
+    (set): Env => ({
+      personalAccessToken: "",
+      projectId: "",
+      setPersonalAccessToken: (personalAccessToken) => set({ personalAccessToken }),
+      setProjectId: (projectId) => set({ projectId }),
+    }),
+    {
+      name: "envStore",
+    }
+  )
+);
+
+function App() {
+  const personalAccessToken = useEnvStore((env) => env.personalAccessToken);
+  const projectId = useEnvStore((env) => env.projectId);
+  const setPersonalAccessToken = useEnvStore((env) => env.setPersonalAccessToken);
+  const setProjectId = useEnvStore((env) => env.setProjectId);
+
+  // const [personalAccessToken, setPersonalAccessToken] = useState<string>("");
+  // const [projectId, setProjectId] = useState<string>("");
+  const [filters, setFilters] = useState<Filter[]>([{ key: "name", value: "", type: "text" }]);
+  const [copyTargets, setCopyTargets] = useState<DistributiveOmit<Filter, "value">[]>([]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     console.log(filters);
     console.log(copyTargets);
+    copyFilteredRows(personalAccessToken, projectId, filters, copyTargets);
   };
 
   return (
@@ -46,6 +90,7 @@ function App() {
                   return newFilters;
                 })
               }
+              placeholder="field key"
             />
             <Input
               value={filter.value}
@@ -56,6 +101,7 @@ function App() {
                   return newFilters;
                 })
               }
+              placeholder="value"
             />
             <Select
               value={filter.type}
@@ -75,6 +121,7 @@ function App() {
                   return newFilters;
                 })
               }
+              placeholder="field type"
             >
               <MenuItem value="text">Text</MenuItem>
               <MenuItem value="date">Date</MenuItem>
