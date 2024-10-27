@@ -72,7 +72,19 @@ function App() {
   return (
     <Container>
       <Box sx={{ p: 2, borderBottom: "1px solid grey", display: "flex", flexDirection: "column" }}>
-        <Link href="https://github.com/settings/tokens">PERSONAL_ACCESS_TOKEN設定リンク</Link>
+        <Box
+          component="section"
+          sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px", alignItems: "center" }}
+        >
+          <Link href="https://github.com/settings/tokens">PERSONAL_ACCESS_TOKEN設定リンク</Link>
+          <TextField
+            type="password"
+            label="PERSONAL_ACCESS_TOKEN"
+            variant="standard"
+            value={personalAccessToken}
+            onChange={(e) => setPersonalAccessToken(e.target.value)}
+          />
+        </Box>
         <Box sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px" }}>
           <TextField
             value={projectNumber}
@@ -92,13 +104,6 @@ function App() {
         </Box>
       </Box>
       <Box component="section" sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px" }}>
-        <TextField
-          type="password"
-          label="PERSONAL_ACCESS_TOKEN"
-          variant="standard"
-          value={personalAccessToken}
-          onChange={(e) => setPersonalAccessToken(e.target.value)}
-        />
         <TextField
           label="PROJECT_ID"
           variant="standard"
@@ -220,7 +225,7 @@ function App() {
           ))}
         </Box>
         <Button type="submit" variant="contained">
-          Submit
+          Copy
         </Button>
       </form>
     </Container>
