@@ -72,6 +72,7 @@ function App() {
       <Link href="https://github.com/settings/tokens">PERSONAL_ACCESS_TOKEN設定リンク</Link>
       <Box component="section" sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px" }}>
         <TextField
+          type="password"
           label="PERSONAL_ACCESS_TOKEN"
           variant="standard"
           value={personalAccessToken}
