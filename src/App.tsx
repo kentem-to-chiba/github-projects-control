@@ -57,8 +57,6 @@ function App() {
   const setPersonalAccessToken = useEnvStore((env) => env.setPersonalAccessToken);
   const setProjectId = useEnvStore((env) => env.setProjectId);
 
-  // const [personalAccessToken, setPersonalAccessToken] = useState<string>("");
-  // const [projectId, setProjectId] = useState<string>("");
   const [filters, setFilters] = useState<Filter[]>([]);
   const [copyTargets, setCopyTargets] = useState<DistributiveOmit<Filter, "value">[]>([]);
 
