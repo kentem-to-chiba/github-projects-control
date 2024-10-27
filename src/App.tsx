@@ -4,6 +4,7 @@ import { Box, Button, Container, InputLabel, Link, MenuItem, Select, TextField }
 import copyFilteredRows from "./core/copyFilteredRows";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import findProjectId from "./core/findProjectId";
 
 type KeyOfUnion<T> = T extends T ? keyof T : never;
 export type DistributiveOmit<T, K extends KeyOfUnion<T>> = T extends T ? Omit<T, K> : never;
@@ -57,6 +58,7 @@ function App() {
   const setPersonalAccessToken = useEnvStore((env) => env.setPersonalAccessToken);
   const setProjectId = useEnvStore((env) => env.setProjectId);
 
+  const [projectNumber, setProjectNumber] = useState<number>();
   const [filters, setFilters] = useState<Filter[]>([]);
   const [copyTargets, setCopyTargets] = useState<DistributiveOmit<Filter, "value">[]>([]);
 
@@ -69,7 +71,26 @@ function App() {
 
   return (
     <Container>
-      <Link href="https://github.com/settings/tokens">PERSONAL_ACCESS_TOKEN設定リンク</Link>
+      <Box sx={{ p: 2, borderBottom: "1px solid grey", display: "flex", flexDirection: "column" }}>
+        <Link href="https://github.com/settings/tokens">PERSONAL_ACCESS_TOKEN設定リンク</Link>
+        <Box sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px" }}>
+          <TextField
+            value={projectNumber}
+            onChange={(e) => setProjectNumber(Number(e.target.value))}
+            label="project number"
+            variant="standard"
+          />
+          <Button
+            onClick={async () => {
+              if (!projectNumber) return;
+              const { title, id } = await findProjectId(personalAccessToken, projectNumber);
+              alert(`title: ${title}, id: ${id}`);
+            }}
+          >
+            project numberからPROJECT_IDを探す
+          </Button>
+        </Box>
+      </Box>
       <Box component="section" sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px" }}>
         <TextField
           type="password"
