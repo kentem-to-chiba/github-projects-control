@@ -1,6 +1,6 @@
 import { FormEventHandler, useState } from "react";
 import "./App.css";
-import { Button, Container, Input, MenuItem, Select } from "@mui/material";
+import { Box, Button, Container, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import copyFilteredRows from "./core/copyFilteredRows";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -59,7 +59,7 @@ function App() {
 
   // const [personalAccessToken, setPersonalAccessToken] = useState<string>("");
   // const [projectId, setProjectId] = useState<string>("");
-  const [filters, setFilters] = useState<Filter[]>([{ key: "name", value: "", type: "text" }]);
+  const [filters, setFilters] = useState<Filter[]>([]);
   const [copyTargets, setCopyTargets] = useState<DistributiveOmit<Filter, "value">[]>([]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
@@ -71,107 +71,136 @@ function App() {
 
   return (
     <Container>
-      <Input
-        placeholder="PERSONAL_ACCESS_TOKEN"
-        value={personalAccessToken}
-        onChange={(e) => setPersonalAccessToken(e.target.value)}
-      />
-      <Input placeholder="PROJECT_ID" value={projectId} onChange={(e) => setProjectId(e.target.value)} />
+      <Box component="section" sx={{ p: 2, border: "1px dashed grey", display: "flex", gap: "32px" }}>
+        <TextField
+          label="PERSONAL_ACCESS_TOKEN"
+          variant="standard"
+          value={personalAccessToken}
+          onChange={(e) => setPersonalAccessToken(e.target.value)}
+        />
+        <TextField
+          label="PROJECT_ID"
+          variant="standard"
+          value={projectId}
+          onChange={(e) => setProjectId(e.target.value)}
+        />
+      </Box>
       <form onSubmit={handleSubmit}>
-        <Button onClick={() => setFilters((prev) => [...prev, { key: "", value: "", type: "text" }])}>Add</Button>
-        {filters.map((filter, index) => (
-          <div key={index}>
-            <Input
-              value={filter.key}
-              onChange={(e) =>
-                setFilters((prev) => {
-                  const newFilters = [...prev];
-                  newFilters[index].key = e.target.value;
-                  return newFilters;
-                })
-              }
-              placeholder="field key"
-            />
-            <Input
-              value={filter.value}
-              onChange={(e) =>
-                setFilters((prev) => {
-                  const newFilters = [...prev];
-                  newFilters[index].value = e.target.value;
-                  return newFilters;
-                })
-              }
-              placeholder="value"
-            />
-            <Select
-              value={filter.type}
-              onChange={(e) =>
-                setFilters((prev) => {
-                  const newFilters = [...prev];
-                  const newValue = e.target.value;
-                  if (
-                    newValue !== "text" &&
-                    newValue !== "date" &&
-                    newValue !== "number" &&
-                    newValue !== "singleSelect" &&
-                    newValue !== "iteration"
-                  )
-                    return prev;
-                  newFilters[index].type = newValue;
-                  return newFilters;
-                })
-              }
-              placeholder="field type"
-            >
-              <MenuItem value="text">Text</MenuItem>
-              <MenuItem value="date">Date</MenuItem>
-              <MenuItem value="number">Number</MenuItem>
-              <MenuItem value="singleSelect">Single Select</MenuItem>
-              <MenuItem value="iteration">Iteration</MenuItem>
-            </Select>
-          </div>
-        ))}
-        <Button onClick={() => setCopyTargets((prev) => [...prev, { key: "", type: "text" }])}>Add</Button>
-        {copyTargets.map((filter, index) => (
-          <div key={index}>
-            <Input
-              value={filter.key}
-              onChange={(e) =>
-                setCopyTargets((prev) => {
-                  const newFilters = [...prev];
-                  newFilters[index].key = e.target.value;
-                  return newFilters;
-                })
-              }
-            />
-            <Select
-              value={filter.type}
-              onChange={(e) =>
-                setCopyTargets((prev) => {
-                  const newFilters = [...prev];
-                  const newValue = e.target.value;
-                  if (
-                    newValue !== "text" &&
-                    newValue !== "date" &&
-                    newValue !== "number" &&
-                    newValue !== "singleSelect" &&
-                    newValue !== "iteration"
-                  )
-                    return prev;
-                  newFilters[index].type = newValue;
-                  return newFilters;
-                })
-              }
-            >
-              <MenuItem value="text">Text</MenuItem>
-              <MenuItem value="date">Date</MenuItem>
-              <MenuItem value="number">Number</MenuItem>
-              <MenuItem value="singleSelect">Single Select</MenuItem>
-              <MenuItem value="iteration">Iteration</MenuItem>
-            </Select>
-          </div>
-        ))}
-        <Button type="submit">Submit</Button>
+        <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+          <Button onClick={() => setFilters((prev) => [...prev, { key: "", value: "", type: "text" }])}>
+            コピー条件の追加
+          </Button>
+          {filters.map((filter, index) => (
+            <Box key={index} sx={{ display: "flex", gap: "8px" }}>
+              <TextField
+                label="field key"
+                variant="standard"
+                value={filter.key}
+                onChange={(e) =>
+                  setFilters((prev) => {
+                    const newFilters = [...prev];
+                    newFilters[index].key = e.target.value;
+                    return newFilters;
+                  })
+                }
+              />
+              <TextField
+                label="value"
+                variant="standard"
+                value={filter.value}
+                onChange={(e) =>
+                  setFilters((prev) => {
+                    const newFilters = [...prev];
+                    newFilters[index].value = e.target.value;
+                    return newFilters;
+                  })
+                }
+              />
+              <Box>
+                <InputLabel id={`filterSelect-${index}`}>field type</InputLabel>
+                <Select
+                  labelId={`filterSelect-${index}`}
+                  value={filter.type}
+                  onChange={(e) =>
+                    setFilters((prev) => {
+                      const newFilters = [...prev];
+                      const newValue = e.target.value;
+                      if (
+                        newValue !== "text" &&
+                        newValue !== "date" &&
+                        newValue !== "number" &&
+                        newValue !== "singleSelect" &&
+                        newValue !== "iteration"
+                      )
+                        return prev;
+                      newFilters[index].type = newValue;
+                      return newFilters;
+                    })
+                  }
+                >
+                  <MenuItem value="text">Text</MenuItem>
+                  <MenuItem value="date">Date</MenuItem>
+                  <MenuItem value="number">Number</MenuItem>
+                  <MenuItem value="singleSelect">Single Select</MenuItem>
+                  <MenuItem value="iteration">Iteration</MenuItem>
+                </Select>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+        <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+          <Button onClick={() => setCopyTargets((prev) => [...prev, { key: "", type: "text" }])}>
+            コピー対象の追加
+          </Button>
+          {copyTargets.map((copyTarget, index) => (
+            <Box key={index} sx={{ display: "flex", gap: "8px" }}>
+              <TextField
+                label="field key"
+                variant="standard"
+                value={copyTarget.key}
+                onChange={(e) =>
+                  setCopyTargets((prev) => {
+                    const newFilters = [...prev];
+                    newFilters[index].key = e.target.value;
+                    return newFilters;
+                  })
+                }
+              />
+              <Box>
+                <InputLabel id={`copyTargetSelect-${index}`}>field type</InputLabel>
+                <Select
+                  labelId={`copyTargetSelect-${index}`}
+                  value={copyTarget.type}
+                  onChange={(e) =>
+                    setCopyTargets((prev) => {
+                      const newFilters = [...prev];
+                      const newValue = e.target.value;
+                      if (
+                        newValue !== "text" &&
+                        newValue !== "date" &&
+                        newValue !== "number" &&
+                        newValue !== "singleSelect" &&
+                        newValue !== "iteration"
+                      )
+                        return prev;
+                      newFilters[index].type = newValue;
+                      return newFilters;
+                    })
+                  }
+                >
+                  <MenuItem value="text">Text</MenuItem>
+                  <MenuItem value="date">Date</MenuItem>
+                  <MenuItem value="number">Number</MenuItem>
+                  <MenuItem value="singleSelect">Single Select</MenuItem>
+                  <MenuItem value="iteration">Iteration</MenuItem>
+                </Select>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+        <Button type="submit" variant="contained">
+          Submit
+        </Button>
       </form>
     </Container>
   );
